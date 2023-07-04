@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load bootstrap5 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block title %}{% trans "User Profile" %}{% endblock %}
+{% block head %}{{ form.media }}{% endblock head %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-sm-4">
+        <div class="form-content">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label class="small mb-1">{% trans "Username" %}:</label>
+                                {{ user_form.username }}
+                            <label class="small mb-1">{% trans "Email" %}:</label>
+                                {{ user_form.email }}
+                        </div>
+                        <div class="form-group">
+                            <label class="small mb-1">{% trans "Get Newsletter" %}:</label>
+                            {{ profile_form.get_newsletter }}
+                        </div>
+                    </div>
+                </div>
+                <br><br>
+                <button type="submit" class="btn btn-dark btn-lg">{% trans "Save Changes" %}</button>
+                <button type="reset" class="btn btn-dark btn-lg">{% trans "Reset" %}</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-12 col-sm-8">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="own-tab" data-bs-toggle="tab" href="#own" role="tab" aria-controls="own" aria-selected="true">Own Reviews ({{user.profile.get_own_reviews_count}})</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="others-tab" data-bs-toggle="tab" href="#others" role="tab" aria-controls="others" aria-selected="false">Others Reviews ({{user.profile.get_others_reviews_count}})</a>
+          </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="own" role="tabpanel" aria-labelledby="own-tab">
+                <div class="filter__btns align-between">
+                    <button class="btn btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter1" aria-expanded="false" aria-controls="collapseFilter1">
+                        <i class="fa-solid fa-filter"></i>
+                    </button>
+                </div>
+                <div class="collapse" id="collapseFilter1">
+                    <div class="card card-body">
+                        <form method="get" class="form filter">
+                            {% csrf_token %}
+                            {% bootstrap_form own_filter layout='inline' bound_css_class='' %}
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary">
+                                    Submit
+                                </button>
+                            {% endbuttons %}
+                        </form>
+                    </div>
+                </div>
+                {% for review in own_reviews %}
+                    <div class="card">
+                        <div class="card-header">
+                            {{review.advert.title}} - <small><i>{{review.advert.author.username}}</i></small>
+                        </div>
+                        <div class="card-body">
+                        <blockquote class="blockquote mb-0">
+                            <p>{{review.body|safe}}</p>
+                            <footer class="blockquote-footer">
+                                {{review.author.username}}
+                                <cite title="Source Title">{{review.created_at}}</cite>
+                                {% if review.active %}
+                                    <div class="alert alert-success" role="alert">
+                                        Active
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-warning" role="alert">
+                                        Inactive
+                                    </div>
+                                {% endif %}
+                            </footer>
+                        </blockquote>
+                        </div>
+                    </div>
+                {% endfor %}
+                {% bootstrap_pagination own_reviews url="/settings/profile?page=1&flop=flip" extra="q=foo" size="small" %}
+            </div>
+            <div class="tab-pane fade" id="others" role="tabpanel" aria-labelledby="others-tab">
+                <div class="filter__btns align-between">
+                    <button class="btn btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter2" aria-expanded="false" aria-controls="collapseFilter2">
+                        <i class="fa-solid fa-filter"></i>
+                    </button>
+                </div>
+                <div class="collapse" id="collapseFilter2">
+                    <div class="card card-body">
+                        <form method="get" class="form filter">
+                            {% csrf_token %}
+                            {% bootstrap_form others_filter layout='inline' bound_css_class='' %}
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary">
+                                    Submit
+                                </button>
+                            {% endbuttons %}
+                        </form>
+                    </div>
+                </div>
+                {% for review in others_reviews %}
+                  <div class="card">
+                      <div class="card-header">
+                        {{review.author.username}}
+                      </div>
+                      <div class="card-body">
+                        <blockquote class="blockquote mb-0">
+                          <p>{{review.body|safe}}</p>
+                          <footer class="blockquote-footer">
+                              <cite title="Source Title">{{review.created_at}}</cite>
+                              {% if review.active %}
+                                  <div class="alert alert-success swap-active" role="alert">
+                                    Active
+                                    <div>
+                                      <span><a href="{% url 'advert:swap-review' review.id %}"><i class="fa-solid fa-right-left"></i></a></span>
+                                      <span><a href="{% url 'advert:review-delete' review.id %}"><i class="fa-solid fa-trash"></i></a></span>
+                                    </div>
+                                  </div>
+                              {% else %}
+                                  <div class="alert alert-warning swap-active" role="alert">
+                                    Inactive
+                                    <div>
+                                      <span><a href="{% url 'advert:swap-review' review.id %}"><i class="fa-solid fa-right-left"></i></a></span>
+                                      <span><a href="{% url 'advert:review-delete' review.id %}"><i class="fa-solid fa-trash"></i></a></span>
+                                    </div>
+                                  </div>
+                              {% endif %}
+                          </footer>
+                        </blockquote>
+                      </div>
+                  </div>
+                {% endfor %}
+                {% bootstrap_pagination others_reviews url="/settings/profile?page=1&flop=flip" extra="q=foo" size="small" %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

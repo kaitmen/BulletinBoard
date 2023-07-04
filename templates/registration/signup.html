@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="row justify-content-md-center">
+  <div class="col-sm-5">
+    <div class="card text-center">
+      <div class="card-header">
+        {% trans "Register" %}
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-success">{% trans "Register" %}</button>
+        </form>
+      </div>
+      <div class="card-footer text-muted">
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

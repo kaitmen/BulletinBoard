@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap5 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block nav_links %}
+    nav-link active
+{% endblock nav_links %}
+
+{% block alerts %}
+    {% bootstrap_messages %}
+{% endblock alerts %}
+
+{% block filter %}
+    <div class="filter__btns align-between">
+        <button class="btn btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter1" aria-expanded="false" aria-controls="collapseFilter1">
+            <i class="fa-solid fa-filter"></i>
+        </button>
+    </div>
+    <div class="collapse" id="collapseFilter1">
+      <div class="card card-body">
+        <form method="get" class="form custom_display_style">
+          {% csrf_token %}
+          {% bootstrap_form form layout='inline' bound_css_class='' %}
+          {% buttons %}
+            <button type="submit" class="btn btn-primary">
+              Submit
+            </button>
+          {% endbuttons %}
+        </form>
+      </div>
+    </div>
+{% endblock filter %}
+
+{% block content %}
+  <div class="card-group">
+    {% for obj in reviews %}
+      <div class="card border-light mb-3" style="max-width: 18rem;">
+        <div class="card-header">{{obj.advert.title}}</div>
+        <div class="card-body">
+          <h5 class="card-title">{{obj.author.name}}</h5>
+          <p class="card-text">{{obj.body|safe}}</p>
+        </div>
+        <div class="card-footer bg-transparent border-success">{{obj.created_at}}</div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock content %}
+
+{% block pagination %}
+    {% bootstrap_pagination reviews url="/reviews?page=1&flop=flip" extra="q=foo" size="small" %}
+{% endblock pagination %}

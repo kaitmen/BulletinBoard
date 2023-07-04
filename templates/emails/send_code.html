@@ -1,0 +1,14 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>{{ user.username }} {% trans "You was registered on site" %}!</h2>
+    <p>{% trans "Copy code and click on link" %} <span>{{ code }}</span></p>
+    <a href="{{link}}">{% trans "Click On Link" %}</a>
+</body>
+</html>

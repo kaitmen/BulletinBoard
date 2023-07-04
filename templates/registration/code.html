@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Register Code" %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-md-center">
+  <div class="col-sm-5">
+    <div class="card text-center">
+      <div class="card-header">
+        {% trans "Hello" %}, {{ user.username }} <br>{% trans "Enter code from email" %}
+      </div>
+      <div class="card-body">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="code">{% trans "Enter code" %}</label>
+            <input type="text" class="form-control" name="code" id="code" aria-describedby="codeHelp" placeholder="Enter Code">
+            <small id="codeHelp" class="form-text text-muted">{% trans "Enter code" %}</small>
+          </div>
+          <input type="submit" value="Send">
+        </form>
+      </div>
+      <div class="card-footer text-muted">
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

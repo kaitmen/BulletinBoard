@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap5 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block nav_links %}
+    nav-link active
+{% endblock nav_links %}
+
+{% block alerts %}
+    {% bootstrap_messages %}
+{% endblock alerts %}
+
+{% block filter %}
+    <div class="filter__btns align-between">
+        <button class="btn btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter1" aria-expanded="false" aria-controls="collapseFilter1">
+            <i class="fa-solid fa-filter"></i>
+        </button>
+    </div>
+    <div class="collapse" id="collapseFilter1">
+      <div class="card card-body">
+        <form method="get" class="form filter">
+          {% csrf_token %}
+          {% bootstrap_form form layout='inline' bound_css_class='' %}
+          {% buttons %}
+            <button type="submit" class="btn btn-primary">
+              Submit
+            </button>
+          {% endbuttons %}
+        </form>
+      </div>
+    </div>
+{% endblock filter %}
+
+{% block content %}
+  <div class="card-group">
+    <div class="card-header d-flex justify-content-between" style="width: 100%; margin-bottom: 1rem">
+      <span>{% trans "Adverts" %}</span>
+      {% if user.is_authenticated %}
+        <span><a href="{% url 'advert:advert-add' %}"><i class="fa-solid fa-plus"></i></a></span>
+      {% endif %}
+    </div>
+    {% for obj in adverts %}
+      <div class="card border-dark mb-3" style="max-width: 20rem;">
+        <a href="{% url 'advert:advert-detail' obj.pk %}" style="text-decoration: none;">
+          <div class="card-header">{{obj.author.username}}</div>
+          <div class="card-body text-dark">
+            <h5 class="card-title">{{obj.title}}</h5>
+            <p class="card-text">{{obj.body|safe}}</p>
+          </div>
+          <div class="card-footer text-muted">
+            {{obj.created_at}}
+          </div>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock content %}
+
+{% block pagination %}
+    {% bootstrap_pagination adverts url="/adverts?page=1&flop=flip" extra="q=foo" size="small" %}
+{% endblock pagination %}

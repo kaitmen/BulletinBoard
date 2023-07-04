@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap5 %}
+
+{% block title %}{% trans "Detail Advert" %}{% endblock %}
+{% block head %}{{ form.media }}{% endblock head %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12 col-sm-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between" style="width: 100%; margin-bottom: 1rem">
+        <span>{{advert.title}}</span>
+        {% if advert.author == user %}
+        <div>
+          <span><a class="btn btn-primary" href="{% url 'advert:advert-update' advert.id %}"><i class="fa-solid fa-edit"></i></a></span>
+          <span><a class="btn btn-primary" href="{% url 'advert:advert-delete' advert.id %}"><i class="fa-solid fa-trash"></i></a></span>
+        </div>
+        {% endif %}
+      </div>
+        <div class="card border-dark mb-3" style="max-width: 20rem;">
+          <div class="card-header">{{advert.author.username}}</div>
+          <div class="card-body text-dark">
+            <h5 class="card-title">{{advert.title}}</h5>
+            <p class="card-text">{{advert.body|safe}}</p>
+          </div>
+          <div class="card-footer text-muted">
+            {{advert.created_at}}
+          </div>
+        </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between" style="width: 100%; margin-bottom: 1rem">
+        <span>
+          {% trans "Reviews" %}
+          {% if user.is_authenticated %}
+            <button data-bs-toggle="modal" data-bs-target="#createReviewModal">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          {% endif %}
+        </span>
+        <span>
+          Total: {{advert.get_reviews_count}}
+        </span>
+      </div>
+      {% for review in advert.get_active_reviews %}
+        <div class="card">
+          <div class="card-header">
+            {{review.created_at}}
+          </div>
+          <div class="card-body">
+            <blockquote class="blockquote mb-0">
+              <p>{{review.body|safe}}</p>
+              <footer class="blockquote-footer"><cite title="Source Title">{{review.author.username}}</cite></footer>
+            </blockquote>
+          </div>
+        </div>
+      {% empty %}
+        <div class="card">
+          <div class="card-header">
+            {% trans "There are no comments, you can be first!" %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+<!-- Create Review Modal -->
+<div class="modal fade" id="createReviewModal" tabindex="-1" role="dialog" aria-labelledby="createReviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="width: 580px">
+      <form method="post">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createReviewModalLabel">{% trans "Create new review" %}</h5>
+          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {% csrf_token %}
+          {{ form.as_p }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Close" %}</button>
+          <button type="submit" class="btn btn-primary">{% trans "Create" %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+{% endblock content %}
